@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwriting Font Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Handwriting Font Generator</h1>
+        <p>Generate handwriting fonts using VAE</p>
+
+        <div class="controls">
+            <select id="modelType">
+                <option value="Hindi">Hindi</option>
+                <option value="English">English</option>
+            </select>
+            <button onclick="generateFont()">Generate</button>
+        </div>
+
+        <div class="result">
+            <img id="generatedImage" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+        function generateFont() {
+            const modelType = document.getElementById('modelType').value;
+            const formData = new FormData();
+            formData.append('model_type', modelType);
+
+            fetch('/generate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const img = document.getElementById('generatedImage');
+                img.src = URL.createObjectURL(blob);
+                img.style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

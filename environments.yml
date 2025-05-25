@@ -7,5 +7,5 @@ dependencies:
   - opencv
   - pip
   - pip:
-      - streamlit
+      - flask
       - flake8
