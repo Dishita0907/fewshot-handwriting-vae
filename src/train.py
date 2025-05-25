@@ -4,20 +4,15 @@ from pathlib import Path
 from models.vae import VAE
 from data_pipeline.dataloader import get_dataloader
 
-def train(
-    data_dir,
-    output_dir,
-    epochs=100,
-    batch_size=32,
-    learning_rate=1e-3,
-    latent_dim=128,
-    device="cuda" if torch.cuda.is_available() else "cpu"
-):
+def train_model(language, epochs=100, batch_size=32, learning_rate=1e-3, latent_dim=128):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    data_dir = f"data/processed/{language}"
+    output_dir = Path(f"models/checkpoints/{language}")
+    
     # Setup
     model = VAE(latent_dim=latent_dim).to(device)
     optimizer = Adam(model.parameters(), lr=learning_rate)
     dataloader = get_dataloader(data_dir, batch_size=batch_size)
-    output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Training loop
@@ -37,7 +32,7 @@ def train(
             total_loss += loss.item()
             
         avg_loss = total_loss / len(dataloader)
-        print(f'Epoch {epoch+1}/{epochs}, Average Loss: {avg_loss:.4f}')
+        print(f'[{language}] Epoch {epoch+1}/{epochs}, Average Loss: {avg_loss:.4f}')
         
         # Save checkpoint
         if (epoch + 1) % 10 == 0:
@@ -52,8 +47,10 @@ def train(
     # Save final model
     torch.save(model.state_dict(), output_dir / "final_model.pt")
 
+def run():
+    # Train models for both languages
+    train_model("hindi")
+    train_model("english")
+
 if __name__ == "__main__":
-    train(
-        data_dir="data/processed/hindi",
-        output_dir="models/checkpoints"
-    )
+    run()

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import torch
 import numpy as np
 from PIL import Image
@@ -20,8 +20,8 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    model_type = request.form.get('model_type', 'Hindi')
-    model_path = f"models/checkpoints/final_model_{model_type.lower()}.pt"
+    model_type = request.form.get('model_type', 'Hindi').lower()
+    model_path = f"models/checkpoints/{model_type}/final_model.pt"
 
     if not Path(model_path).exists():
         return jsonify({'error': f'Model for {model_type} not found. Please train the model first.'})
